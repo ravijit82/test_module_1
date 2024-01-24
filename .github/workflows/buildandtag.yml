@@ -1,20 +1,66 @@
-name: Publish
+name: Release Workflow
 
 on:
-  release:
-    types: [published, edited]
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
-      - name: Install deps and build
-        run: npm ci && npm run build
-      - uses: JasonEtco/build-and-tag-action@v2
-        tag_name: ${{ steps.releaser.outputs.tag_name }}
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build release
+        run: npm run build
+
+  tag:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Release Tag
+        uses: actions/github-script@0.10.0
+        with:
+          script: |
+            const { data: releases } = await github.repos.listReleases({ owner: context.repo.owner, repo: context.repo.repo });
+            const latestRelease = releases[0];
+            const version = latestRelease ? incrementVersion(latestRelease.tag_name) : '1.0.0';
+
+            await github.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: version,
+              name: `Release ${version}`,
+              draft: false,
+              prerelease: false,
+            });
+
+            function incrementVersion(currentVersion) {
+              const [major, minor, patch] = currentVersion.split('.').map(Number);
+              return `${major}.${minor}.${patch + 1}`;
+            }
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish Package
+        uses: actions/npm@v1
+        with:
+          command: "publish"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
