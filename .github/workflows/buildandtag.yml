@@ -16,5 +16,6 @@ jobs:
       - name: Install deps and build
         run: npm ci && npm run build
       - uses: JasonEtco/build-and-tag-action@v2
+        tag_name: ${{ steps.releaser.outputs.tag_name }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
