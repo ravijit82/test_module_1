@@ -24,43 +24,18 @@ jobs:
       - name: Build release
         run: npm run build
 
-  tag:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Create Release Tag
-        uses: actions/github-script@v7
+      - name: Generate release tag
+        id: generate_release_tag
+        uses: amitsingh-007/next-release-tag@v4.0.0
         with:
-          script: |
-            const { data: releases } = await github.repos.listReleases({ owner: context.repo.owner, repo: context.repo.repo });
-            const latestRelease = releases[0];
-            const version = latestRelease ? incrementVersion(latestRelease.tag_name) : '1.0.0';
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: "v"
+          tag_template: "yyyy.mm.dd.i"
 
-            await github.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: version,
-              name: `Release ${version}`,
-              draft: false,
-              prerelease: false,
-            });
-
-            function incrementVersion(currentVersion) {
-              const [major, minor, patch] = currentVersion.split('.').map(Number);
-              return `${major}.${minor}.${patch + 1}`;
-            }
+      - name: Create Release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish:
-    needs: tag
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Publish Package
-        uses: actions/npm@v1
         with:
-          command: "publish"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          tag_name: ${{ steps.generate_release_tag.outputs.next_release_tag }}
+          release_name: Release ${{ steps.generate_release_tag.outputs.next_release_tag }}
