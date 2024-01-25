@@ -33,4 +33,3 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           registry: "https://npm.pkg.github.com"
-          tag: ${{ steps.tag_version.outputs.new_tag }}
