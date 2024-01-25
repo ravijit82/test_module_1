@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@vlatest
+        uses: actions/checkout@latest
       - name: Set up Node.js
-        uses: actions/setup-node@vlatest
+        uses: actions/setup-node@latest
         with:
           node-version: 18
       - name: Install dependencies
