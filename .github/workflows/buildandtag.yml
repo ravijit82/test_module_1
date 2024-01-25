@@ -38,7 +38,7 @@ name: Release Workflow
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   release-on-push:
