@@ -2,9 +2,9 @@
   "name": "test_module_1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ravijit82/test_module_1.git"
+    "url": "git+https://github.com/ravijit82/test_module_1.git"
   },
-  "version": "1.0.0",
+  "version": "0.0.4",
   "description": "",
   "module": "dist/index.esm.js",
   "main": "dist/index.cjs.js",
