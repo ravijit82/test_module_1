@@ -1,5 +1,9 @@
 {
   "name": "test_module_1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ravijit82/test_module_1.git"
+  },
   "version": "1.0.0",
   "description": "",
   "module": "dist/index.esm.js",
