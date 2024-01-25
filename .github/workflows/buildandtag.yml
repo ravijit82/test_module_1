@@ -1,36 +1,59 @@
 name: Release Workflow
 
+# on:
+#   push:
+#     tags:
+#       - "v*"
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       # - name: Set up Node.js
+#       #   uses: actions/setup-node@v4
+#       #   with:
+#       #     node-version: 16
+
+#       # - name: Install dependencies
+#       #   run: npm install
+
+#       # - name: Build release
+#       #   run: npm run build
+
+#       - name: Create Release
+#         id: create_release
+#         uses: actions/create-release@latest
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           tag_name: ${{ github.ref }}
+#           release_name: Release ${{ github.ref }}
+#           draft: false
+#           prerelease: false
+
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - master
 
 jobs:
-  build:
+  release-on-push:
     runs-on: ubuntu-latest
-
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # - name: Set up Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 16
-
-      # - name: Install dependencies
-      #   run: npm install
-
-      # - name: Build release
-      #   run: npm run build
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: release
+        uses: rymndhng/release-on-push-action@master
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          bump_version_scheme: minor
+          tag_prefix: v
+
+      - name: Check Output Parameters
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
+          echo "Upload release artifacts to ${{ steps.release.outputs.upload_url }}"
