@@ -33,4 +33,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           registry: "https://npm.pkg.github.com"
-          tag: "1.0.0"
+          tag: "test_module_1"
